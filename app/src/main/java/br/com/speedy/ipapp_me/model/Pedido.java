@@ -1,0 +1,100 @@
+package br.com.speedy.ipapp_me.model;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+/**
+ * Created by henrique on 30/04/2015.
+ */
+public class Pedido {
+
+    private Long id;
+
+    private Date data;
+
+    private Date dataEntrega;
+
+    private BigDecimal valor;
+
+    private String codigo;
+
+    private Vendedor vendedor;
+
+    private Cliente cliente;
+
+    private Transportadora transportadora;
+
+    private String placaCarro;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Date getData() {
+        return data;
+    }
+
+    public void setData(Date data) {
+        this.data = data;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
+    }
+
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public Vendedor getVendedor() {
+        return vendedor;
+    }
+
+    public void setVendedor(Vendedor vendedor) {
+        this.vendedor = vendedor;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Transportadora getTransportadora() {
+        return transportadora;
+    }
+
+    public void setTransportadora(Transportadora transportadora) {
+        this.transportadora = transportadora;
+    }
+
+    public String getPlacaCarro() {
+        return placaCarro;
+    }
+
+    public void setPlacaCarro(String placaCarro) {
+        this.placaCarro = placaCarro;
+    }
+
+    public Date getDataEntrega() {
+        return dataEntrega;
+    }
+
+    public void setDataEntrega(Date dataEntrega) {
+        this.dataEntrega = dataEntrega;
+    }
+}

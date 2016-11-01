@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Iranduba Pescados - Módulo Expedição</string>
+    <string name="title_activity_main">Módulo Expedição</string>
+    <string name="title_activity_pedido">Detalhes do Pedido</string>
+    <string name="title_activity_estoque">Estoque por câmara</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_imei">IMEI</string>
+    <string name="action_close">Fechar</string>
+
+    <string name="title_section1">Pedidos</string>
+    <string name="title_section11">Produtos</string>
+    <string name="title_section12">Resumo</string>
+</resources>

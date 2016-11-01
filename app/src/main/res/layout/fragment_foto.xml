@@ -1,0 +1,54 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="br.com.speedy.recomendeapp.fragment.FotosFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#9937cbff"
+            android:id="@+id/linearLayout4"
+            android:layout_alignParentTop="true"
+            android:layout_alignLeft="@+id/refreshLayout"
+            android:layout_alignStart="@+id/refreshLayout"
+            android:weightSum="1" >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adicionar Foto"
+                android:id="@+id/btFAdicionar"
+                android:layout_marginTop="5dp"
+                android:textColor="#ffffffff"
+                android:drawableLeft="@drawable/ic_action_action_pageview"
+                android:layout_marginLeft="20dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="5dp" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btExcluir"
+                android:drawableLeft="@drawable/ic_package_variant_white_24dp"
+                android:text="Excluir Fotos"
+                android:layout_marginLeft="20dp"
+                android:textColor="#ffffffff"
+                android:textStyle="bold"
+                android:visibility="visible"
+                android:layout_marginTop="5dp" />
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_list"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLayout4" />
+    </RelativeLayout>
+
+</FrameLayout>

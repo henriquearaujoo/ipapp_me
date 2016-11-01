@@ -1,0 +1,57 @@
+package br.com.speedy.ipapp_me.model;
+
+/**
+ * Created by henrique on 05/05/2015.
+ */
+public class Romaneio {
+
+    private Long id;
+
+    private String lote;
+
+    private Integer qtdeEmbalagens;
+
+    private String observacoes;
+
+    private Produto produto;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLote() {
+        return lote;
+    }
+
+    public void setLote(String lote) {
+        this.lote = lote;
+    }
+
+    public Integer getQtdeEmbalagens() {
+        return qtdeEmbalagens;
+    }
+
+    public void setQtdeEmbalagens(Integer qtdeEmbalagens) {
+        this.qtdeEmbalagens = qtdeEmbalagens;
+    }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
+    }
+
+    public void setObservacoes(String observacoes) {
+        this.observacoes = observacoes;
+    }
+}

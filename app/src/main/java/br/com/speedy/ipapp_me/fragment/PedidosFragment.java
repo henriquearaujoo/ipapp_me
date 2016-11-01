@@ -1,0 +1,358 @@
+package br.com.speedy.ipapp_me.fragment;
+
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.LruCache;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import br.com.speedy.ipapp_me.EstoqueActivity;
+import br.com.speedy.ipapp_me.PedidoActivity;
+import br.com.speedy.ipapp_me.R;
+import br.com.speedy.ipapp_me.adapter.PedidoAdapter;
+import br.com.speedy.ipapp_me.model.Pedido;
+import br.com.speedy.ipapp_me.util.DialogUtil;
+import br.com.speedy.ipapp_me.util.HttpConnection;
+import br.com.speedy.ipapp_me.util.SessionApp;
+import br.com.speedy.ipapp_me.util.SharedPreferencesUtil;
+
+public class PedidosFragment extends ListFragment implements Runnable, SwipeRefreshLayout.OnRefreshListener {
+
+    public static final int ATUALIZAR_LISTA = 1;
+    public static final int ATUALIZAR_LISTA_SWIPE = 2;
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    private List<Pedido> pedidos;
+
+    private Pedido pedido;
+
+    private View pedidosStatus;
+
+    private View pedidosLista;
+
+    private View msgItensNaoEncontrados;
+
+    private PedidoAdapter adapter;
+
+    private Thread threadPedidos;
+
+    private SwipeRefreshLayout refreshLayout;
+
+    private Button btPesquisar;
+
+    private Button btEstoque;
+
+    // TODO: Rename and change types of parameters
+    public static PedidosFragment newInstance(int position) {
+        PedidosFragment fragment = new PedidosFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_PARAM1, position);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    /**
+     * Mandatory empty constructor for the fragment manager to instantiate the
+     * fragment (e.g. upon screen orientation changes).
+     */
+    public PedidosFragment() {
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_pedido_list, container, false);
+
+        pedidosLista = view.findViewById(R.id.pedidos_lista);
+
+        pedidosStatus = view.findViewById(R.id.pedidos_status);
+
+        msgItensNaoEncontrados = view.findViewById(R.id.fp_msg_item_nao_encontrado);
+
+        btPesquisar = (Button) view.findViewById(R.id.btFPPesquisar);
+
+        btEstoque = (Button) view.findViewById(R.id.btFPEstoque);
+
+        btPesquisar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                /*if (txtData.getText() == null || txtData.getText().toString().isEmpty()){
+                    DialogUtil.showDialogAdvertencia(getActivity(), "Selecione uma data antes de efetuar a pesquisa.");
+                }else {
+                    showProgress(true);
+                    threadPedidos = new Thread(PedidosFragment.this);
+                    threadPedidos.start();
+                }*/
+
+                runThread();
+            }
+        });
+
+        btEstoque.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), EstoqueActivity.class);
+                startActivity(i);
+            }
+        });
+
+        initSwipeDownToRefresh(view);
+
+        runThread();
+
+        return view;
+    }
+
+    public void runThread(){
+        showProgress(true);
+        threadPedidos = new Thread(PedidosFragment.this);
+        threadPedidos.start();
+    }
+
+    public void getPedidos(){
+
+        JSONObject object = new JSONObject();
+        try {
+            object.put("status", "AGUARDANDO_EMBARQUE");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        callServer("post-json", object.toString());
+
+        Message msg = new Message();
+        msg.what = ATUALIZAR_LISTA;
+        handler.sendMessage(msg);
+    }
+
+    public void getPedidosJSON(String data){
+        pedidos = new ArrayList<Pedido>();
+
+        try {
+            JSONObject object = new JSONObject(data);
+            JSONArray ja = object.getJSONArray("pedidos");
+
+            for (int i = 0; i < ja.length() ; i++) {
+                Pedido p = new Pedido();
+                p.setId(ja.getJSONObject(i).getLong("id"));
+                p.setCodigo(ja.getJSONObject(i).getString("codigo"));
+                p.setData(new SimpleDateFormat("dd/MM/yyyy").parse(ja.getJSONObject(i).getString("data")));
+                p.setDataEntrega(new SimpleDateFormat("dd/MM/yyyy").parse(ja.getJSONObject(i).getString("dataEntrega")));
+
+                pedidos.add(p);
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void callServer(final String method, final String data){
+
+        String ipServidor = SharedPreferencesUtil.getPreferences(getActivity(), "ip_servidor");
+
+        String endereco_ws = SharedPreferencesUtil.getPreferences(getActivity(), "endereco_ws");
+
+        String porta_servidor = SharedPreferencesUtil.getPreferences(getActivity(), "porta_servidor");
+
+        String resposta = HttpConnection.getSetDataWeb("http://" + ipServidor + ":" + porta_servidor + endereco_ws + "getPedidosPorStatus", method, data);
+
+        if (!resposta.isEmpty())
+            getPedidosJSON(resposta);
+    }
+
+    @Override
+    public void run() {
+        getPedidos();
+    }
+
+    private void showProgress(final boolean show) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(
+                    android.R.integer.config_shortAnimTime);
+
+            refreshLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+            refreshLayout.animate().setDuration(shortAnimTime)
+                    .alpha(show ? 0 : 1)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            refreshLayout.setVisibility(show ? View.GONE
+                                    : View.VISIBLE);
+                        }
+                    });
+
+            pedidosStatus.setVisibility(show ? View.VISIBLE : View.GONE);
+            pedidosStatus.animate().setDuration(shortAnimTime)
+                    .alpha(show ? 1 : 0)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            pedidosStatus.setVisibility(show ? View.VISIBLE
+                                    : View.GONE);
+                        }
+                    });
+
+        } else {
+            refreshLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+            pedidosStatus.setVisibility(show ? View.VISIBLE : View.GONE);
+
+        }
+    }
+
+    private Handler handler = new Handler(){
+
+        @Override
+        public void handleMessage(Message msg) {
+            // TODO Auto-generated method stub
+            switch (msg.what) {
+
+                case ATUALIZAR_LISTA:
+
+                    adapter = new PedidoAdapter(getActivity(), pedidos);
+
+                    setListAdapter(adapter);
+
+                    if (isAdded())
+                        showProgress(false);
+
+                    if (pedidos != null && pedidos.size() > 0) {
+                        refreshLayout.setVisibility(View.VISIBLE);
+                        msgItensNaoEncontrados.setVisibility(View.GONE);
+                    }else{
+                        refreshLayout.setVisibility(View.GONE);
+                        msgItensNaoEncontrados.setVisibility(View.VISIBLE);
+                    }
+
+                    break;
+
+                case ATUALIZAR_LISTA_SWIPE:
+
+                    adapter = new PedidoAdapter(getActivity(), pedidos);
+
+                    setListAdapter(adapter);
+
+                    stopSwipeRefresh();
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        pedido = (Pedido) this.getListAdapter().getItem(position);
+
+        SessionApp.setPedido(pedido);
+
+        PedidoActivity pedidoActivity = new PedidoActivity(this);
+
+        Intent intent = new Intent(getActivity(), pedidoActivity.getClass());
+        startActivity(intent);
+
+    }
+
+    public void initSwipeDownToRefresh(View view){
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refreshLayout);
+        refreshLayout.setOnRefreshListener(this);
+        refreshLayout.setColorScheme(android.R.color.holo_blue_light,
+                android.R.color.white, android.R.color.holo_blue_light,
+                android.R.color.white);
+    }
+
+    @Override
+    public void onRefresh() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("status", "AGUARDANDO_EMBARQUE");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                callServer("post-json", object.toString());
+
+                Message msg = new Message();
+                msg.what = ATUALIZAR_LISTA_SWIPE;
+                handler.sendMessage(msg);
+            }
+        }).start();
+    }
+
+    private void stopSwipeRefresh() {
+        refreshLayout.setRefreshing(false);
+    }
+
+    public static class DatePickerFragment extends DialogFragment
+            implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
+            dialog.setTitle("Selecione a data");
+            dialog.setCancelable(true);
+            return dialog;
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            month = month + 1;
+
+            String dia = day < 10 ? "0" + day : "" + day;
+
+            String mes = month < 10 ? "0" + month : "" + month;
+
+            //txtData.setText(dia + "/" + mes + "/" + year);
+        }
+    }
+}
