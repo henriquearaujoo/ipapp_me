@@ -1,5 +1,6 @@
 package br.com.speedy.ipapp_me.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -42,6 +43,7 @@ public class DialogTransportadoraPedido extends DialogFragment {
 
     }
 
+    @SuppressLint("ValidFragment")
     public DialogTransportadoraPedido(List<Transportadora> transportadoras){
         this.transportadoras = transportadoras;
     }

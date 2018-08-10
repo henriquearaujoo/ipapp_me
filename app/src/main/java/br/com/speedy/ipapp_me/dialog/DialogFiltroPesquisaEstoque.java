@@ -1,5 +1,6 @@
 package br.com.speedy.ipapp_me.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -48,6 +49,7 @@ public class DialogFiltroPesquisaEstoque extends DialogFragment {
 
     }
 
+    @SuppressLint("ValidFragment")
     public DialogFiltroPesquisaEstoque(List<TipoPeixe> tipos){
         this.tipos = tipos;
     }

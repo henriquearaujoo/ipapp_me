@@ -298,6 +298,7 @@ public class PedidoActivity extends ActionBarActivity implements ActionBar.TabLi
                     }
 
                     jPedido.put("produtos", jProdutos);
+                    jPedido.put("posto", SharedPreferencesUtil.getPreferences(PedidoActivity.this, "posto"));
 
                     String resposta = callServer("post-json", jPedido.toString());
 

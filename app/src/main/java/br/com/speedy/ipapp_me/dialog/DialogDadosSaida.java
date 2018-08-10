@@ -1,5 +1,6 @@
 package br.com.speedy.ipapp_me.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -71,6 +72,7 @@ public class DialogDadosSaida extends DialogFragment {
 
     }
 
+    @SuppressLint("ValidFragment")
     public DialogDadosSaida(Context context, List<Camara> camaras, List<TipoPeixe> tipos){
         this.context = context;
         this.camaras = camaras;

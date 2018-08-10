@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.speedy.ipapp_me.dialog.DialogDadosConfiguracaoSenha;
+import br.com.speedy.ipapp_me.enumerated.Posto;
 import br.com.speedy.ipapp_me.model.UltimoLogin;
 import br.com.speedy.ipapp_me.model.Usuario;
 import br.com.speedy.ipapp_me.util.DialogUtil;
@@ -75,18 +76,20 @@ public class LoginActivity extends ActionBarActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
 
         //Utilizar em desenvolvimento
-        SharedPreferencesUtil.writePreferences(LoginActivity.this, "ip_servidor", "192.168.107.2");
-
-        SharedPreferencesUtil.writePreferences(LoginActivity.this, "endereco_ws", "/webapi/myresource/");
-
-        SharedPreferencesUtil.writePreferences(LoginActivity.this, "porta_servidor", "8080");
-
-        //Descomentar pára producao
-        /*SharedPreferencesUtil.writePreferences(LoginActivity.this, "ip_servidor", "192.168.110.2");
+        /*SharedPreferencesUtil.writePreferences(LoginActivity.this, "ip_servidor", "192.168.110.108");
 
         SharedPreferencesUtil.writePreferences(LoginActivity.this, "endereco_ws", "/ws_ipapp/webapi/myresource/");
 
-        SharedPreferencesUtil.writePreferences(LoginActivity.this, "porta_servidor", "7777");*/
+        SharedPreferencesUtil.writePreferences(LoginActivity.this, "porta_servidor", "8081");*/
+
+        //Descomentar pára producao
+        SharedPreferencesUtil.writePreferences(LoginActivity.this, "ip_servidor", "192.168.110.2");
+
+        SharedPreferencesUtil.writePreferences(LoginActivity.this, "endereco_ws", "/ws_ipapp/webapi/myresource/");
+
+        SharedPreferencesUtil.writePreferences(LoginActivity.this, "porta_servidor", "7777");
+
+        SharedPreferencesUtil.writePreferences(LoginActivity.this, "posto", Posto.EXPEDICAO_1.toString());
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
